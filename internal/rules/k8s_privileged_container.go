@@ -1,4 +1,5 @@
 package rules
+
 // Detects if a container is running in privileged mode
 import (
 	"context"
@@ -27,30 +28,30 @@ func (r PrivilegedContainerRule) Supports(obj rulekit.Object) bool {
 }
 
 func (r PrivilegedContainerRule) Evaluate(ctx context.Context, obj rulekit.Object, graph rulekit.ResourceGraph) ([]rulekit.Finding, error) {
-  metadata := r.Metadata()
-  findings := []rulekit.Finding{}
+	metadata := r.Metadata()
+	findings := []rulekit.Finding{}
 
-  for _, container := range containersFromObject(obj) {
-	securityContext := asMap(container.Raw["securityContext"])
-	
-	privileged, _ := securityContext["privileged"].(bool)
-	
-	if !privileged {
-		continue
-	}
+	for _, container := range containersFromObject(obj) {
+		securityContext := asMap(container.Raw["securityContext"])
 
-	findings = append(findings, rulekit.Finding{
-		RuleID:      r.ID(),
-		Resource:    obj,
-	Severity:    metadata.Severity,
-		Title:       metadata.Title,
-		Description: metadata.Description,
-		Evidence: map[string]any{
-			"containerName": container.Name,
-			"privileged":    true,
-		},
-		Remediation: metadata.Remediation,
-	}) 
+		privileged, _ := securityContext["privileged"].(bool)
+
+		if !privileged {
+			continue
+		}
+
+		findings = append(findings, rulekit.Finding{
+			RuleID:      r.ID(),
+			Resource:    obj,
+			Severity:    metadata.Severity,
+			Title:       metadata.Title,
+			Description: metadata.Description,
+			Evidence: map[string]any{
+				"containerName": container.Name,
+				"privileged":    true,
+			},
+			Remediation: metadata.Remediation,
+		})
 	}
 
 	return findings, nil

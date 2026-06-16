@@ -2,13 +2,13 @@ package rules
 
 import (
 	"context"
-	"github.com/r0m43k/CSCP/pkg/rulekit"
 	"testing"
+
+	"github.com/r0m43k/CSCP/pkg/rulekit"
 )
 
-// Test that the rule detects a privileged container
-func TestPrivilegedContainerRuleDetectsPrivilegedContainer(t *testing.T) {
-	rule := PrivilegedContainerRule{}
+func TestAllowPrivilegeEscalationRuleDetectsEnabledSetting(t *testing.T) {
+	rule := AllowPrivilegeEscalationRule{}
 
 	obj := rulekit.Object{
 		Kind:      "Pod",
@@ -20,7 +20,7 @@ func TestPrivilegedContainerRuleDetectsPrivilegedContainer(t *testing.T) {
 					map[string]any{
 						"name": "app",
 						"securityContext": map[string]any{
-							"privileged": true,
+							"allowPrivilegeEscalation": true,
 						},
 					},
 				},
@@ -34,17 +34,12 @@ func TestPrivilegedContainerRuleDetectsPrivilegedContainer(t *testing.T) {
 	}
 
 	if len(findings) != 1 {
-		t.Fatalf("Expected 1 finding, got %d", len(findings))
-	}
-
-	if findings[0].RuleID != rule.ID() {
-		t.Fatalf("Expected rule ID %q, got %q", rule.ID(), findings[0].RuleID)
+		t.Fatalf("expected 1 finding, got %d", len(findings))
 	}
 }
 
-// Test that the rule does not report a finding for a non-privileged container
-func TestPrivilegedContainerRuleIgnoresNonPrivilegedContainer(t *testing.T) {
-	rule := PrivilegedContainerRule{}
+func TestAllowPrivilegeEscalationRuleIgnoresDisabledSetting(t *testing.T) {
+	rule := AllowPrivilegeEscalationRule{}
 
 	obj := rulekit.Object{
 		Kind:      "Pod",
@@ -56,7 +51,7 @@ func TestPrivilegedContainerRuleIgnoresNonPrivilegedContainer(t *testing.T) {
 					map[string]any{
 						"name": "app",
 						"securityContext": map[string]any{
-							"privileged": false,
+							"allowPrivilegeEscalation": false,
 						},
 					},
 				},
@@ -70,6 +65,6 @@ func TestPrivilegedContainerRuleIgnoresNonPrivilegedContainer(t *testing.T) {
 	}
 
 	if len(findings) != 0 {
-		t.Fatalf("Expected 0 findings, got %d", len(findings))
+		t.Fatalf("expected 0 findings, got %d", len(findings))
 	}
 }

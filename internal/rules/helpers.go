@@ -1,10 +1,11 @@
 package rules
 
 import "github.com/r0m43k/CSCP/pkg/rulekit"
-//для извлечения контейнеров из Kubernetes
+
+// для извлечения контейнеров из Kubernetes
 type container struct {
-	Name  string
-	Raw   map[string]any
+	Name string
+	Raw  map[string]any
 }
 
 func containersFromObject(obj rulekit.Object) []container {
@@ -13,7 +14,7 @@ func containersFromObject(obj rulekit.Object) []container {
 		return containersFromPodSpec(asMap(obj.Raw["spec"]))
 
 	case "Deployment", "ReplicaSet", "StatefulSet", "DaemonSet", "Job":
-		spec :=  asMap(obj.Raw["spec"])
+		spec := asMap(obj.Raw["spec"])
 		template := asMap(spec["template"])
 		podSpec := asMap(template["spec"])
 		return containersFromPodSpec(podSpec)
@@ -26,7 +27,6 @@ func containersFromObject(obj rulekit.Object) []container {
 
 		podSpec := asMap(template["spec"])
 		return containersFromPodSpec(podSpec)
-	
 
 	default:
 		return nil
