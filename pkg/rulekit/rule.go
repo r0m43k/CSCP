@@ -1,13 +1,15 @@
 package rulekit
-import "context" // context cancellation
 
+import "context"
+
+// Severity is the normalized risk level for a finding.
 type Severity string
-//ограничение возможными значениями константами чтобы в коде было понятнее и безопаснее
+
 const (
-	SeverityLow     Severity = "Low"
-	SeverityMedium  Severity = "Medium"
-	SeverityHigh    Severity = "High"
-	SeverityCritical Severity = "Critical"
+	SeverityLow      Severity = "LOW"
+	SeverityMedium   Severity = "MEDIUM"
+	SeverityHigh     Severity = "HIGH"
+	SeverityCritical Severity = "CRITICAL"
 )
 
 type Rule interface {
@@ -16,6 +18,7 @@ type Rule interface {
 	Supports(obj Object) bool
 	Evaluate(ctx context.Context, obj Object, graph ResourceGraph) ([]Finding, error)
 }
+
 // Описание security rule
 type RuleMetadata struct {
 	ID          string
@@ -25,7 +28,8 @@ type RuleMetadata struct {
 	Category    string
 	Remediation string
 }
-//нормализованный Kubernetes-объект, который scanner будет проверять
+
+// Object is a normalized Kubernetes resource checked by scanner rules.
 type Object struct {
 	Kind      string
 	Namespace string
@@ -44,4 +48,3 @@ type Finding struct {
 	Evidence    map[string]any
 	Remediation string
 }
-
